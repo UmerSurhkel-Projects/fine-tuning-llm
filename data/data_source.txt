@@ -1,0 +1,68 @@
+TECHGADGETS SUPPORT BOT - DATA SOURCE INFORMATION
+==================================================
+
+Dataset: Bitext Customer Support LLM Training Dataset
+Source: Hugging Face
+URL: https://huggingface.co/datasets/bitext/Bitext-customer-support-llm-chatbot-training-dataset
+
+Dataset Statistics:
+------------------
+- Total Examples: 26,872
+- Categories: 11
+- Intents: 27
+- Format: CSV with structured fields
+
+Dataset Fields:
+--------------
+1. flags        - Language variation tags (B, Q, L, Z, P, E, M, W, I, N, C)
+2. instruction  - Customer query/question
+3. category     - High-level semantic category
+4. intent       - Specific user intent
+5. response     - Example assistant response
+
+Categories:
+-----------
+1. ACCOUNT      - Account management (create, edit, delete, switch)
+2. ORDER        - Order management (cancel, change, track, place)
+3. SHIPPING     - Shipping and delivery options
+4. PAYMENT      - Payment methods and processing
+5. REFUND       - Refund requests and tracking
+6. INVOICE      - Invoice management
+7. FEEDBACK     - Customer complaints and feedback
+8. CANCEL       - Cancellation requests
+9. CONTACT      - Support contact information
+10. DELIVERY    - Delivery status and tracking
+11. SUBSCRIPTION - Newsletter and subscription management
+
+Adaptation Process:
+-------------------
+The original dataset responses were adapted to TechGadgets by:
+1. Replacing generic placeholders with TechGadgets-specific information
+2. Injecting brand mentions (TechGadgets)
+3. Adding company-specific policies:
+   - 30-day money-back guarantee
+   - Standard shipping: 3-5 business days
+   - Express shipping: 2-day for $9.99
+   - Support: 24/7 chat, Mon-Fri 9AM-6PM phone
+   - Warranty: 1-year manufacturer warranty
+   - Price matching available
+
+Training/Validation Split:
+--------------------------
+- Training Examples: 400
+- Validation Examples: 100
+- Total: 500 examples
+
+Selection Strategy:
+-------------------
+- Proportional category distribution
+- Intent diversity
+- Flag diversity (linguistic variations)
+- Non-overlapping between train and validation sets
+
+Output Format:
+--------------
+OpenAI Chat Fine-Tuning JSONL format with:
+- system message: TechGadgets support assistant instructions
+- user message: Customer query (instruction field)
+- assistant message: Adapted response with TechGadgets branding

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechGadgets Support Bot — Evaluation Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --surface: #18181c;
+      --surface2: #1f1f24;
+      --text: #e4e4e7;
+      --text-muted: #a1a1aa;
+      --accent: #22d3ee;
+      --accent-dim: #0891b2;
+      --base-color: #71717a;
+      --ft-color: #34d399;
+      --positive: #34d399;
+      --negative: #f87171;
+      --border: #27272a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .hero-models {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .big-score {
+      text-align: right;
+    }
+    .big-score .label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .big-score .value { font-size: 2rem; font-weight: 700; }
+    .big-score .base .value { color: var(--base-color); }
+    .big-score .ft .value { color: var(--ft-color); }
+    .improve.positive { color: var(--positive); }
+    .improve.negative { color: var(--negative); }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    section h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    td.metric-name { font-weight: 500; }
+    td.question { max-width: 280px; }
+    .score-bar {
+      position: relative;
+      height: 22px;
+      background: var(--surface2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .score-bar .fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 4px;
+      min-width: 2px;
+    }
+    .score-bar .fill.base { background: var(--base-color); }
+    .score-bar .fill.ft { background: var(--ft-color); }
+    .score-bar .score-num {
+      position: relative;
+      z-index: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding-left: 6px;
+      line-height: 22px;
+      color: var(--text);
+    }
+    .sample-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .sample-question {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+      color: var(--accent);
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+    .response-box {
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .response-box.base { background: rgba(113,113,122,0.08); border-color: var(--base-color); }
+    .response-box.ft { background: rgba(52,211,153,0.08); border-color: var(--ft-color); }
+    .response-box h4 { margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--text-muted); }
+    .response-box .score { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin: 0 0 0.5rem 0; }
+    .response-text { font-size: 0.85rem; color: var(--text); max-height: 180px; overflow-y: auto; }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TechGadgets Support Bot — Evaluation Report</h1>
+    <p class="subtitle">Base model vs fine-tuned model comparison</p>
+
+    <div class="hero">
+      <div class="hero-models">
+        <div>Base: gpt-4o-mini-2024-07-18</div>
+        <div>Fine-tuned: ft:gpt-4o-mini-2024-07-18:personal:techgadgets-support:D7e2cpyK</div>
+      </div>
+      <div class="big-score">
+        <div class="base"><span class="label">Base avg</span><div class="value">0.40</div></div>
+        <div class="ft"><span class="label">Fine-tuned avg</span><div class="value">0.75</div></div>
+        <div class="improve positive"><span class="label">Improvement</span><div class="value">+0.35</div></div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Summary by metric</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Base model</th>
+            <th>Fine-tuned</th>
+            <th>Improvement</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+    <tr>
+      <td class="metric-name">Brand Mention</td>
+      <td><div class="score-bar"><span class="fill base" style="width:0.0%"></span><span class="score-num">0.00</span></div></td>
+      <td><div class="score-bar"><span class="fill ft" style="width:100%"></span><span class="score-num">1.00</span></div></td>
+      <td class="improve positive">+1.00</td>
+    </tr>
+    <tr>
+      <td class="metric-name">Policy Accuracy</td>
+      <td><div class="score-bar"><span class="fill base" style="width:29.500000000000004%"></span><span class="score-num">0.30</span></div></td>
+      <td><div class="score-bar"><span class="fill ft" style="width:41.5%"></span><span class="score-num">0.42</span></div></td>
+      <td class="improve positive">+0.12</td>
+    </tr>
+    <tr>
+      <td class="metric-name">Tone Professionalism</td>
+      <td><div class="score-bar"><span class="fill base" style="width:76.49999999999999%"></span><span class="score-num">0.76</span></div></td>
+      <td><div class="score-bar"><span class="fill ft" style="width:85.49999999999999%"></span><span class="score-num">0.85</span></div></td>
+      <td class="improve positive">+0.09</td>
+    </tr>
+    <tr>
+      <td class="metric-name">Format Consistency</td>
+      <td><div class="score-bar"><span class="fill base" style="width:77.99999999999999%"></span><span class="score-num">0.78</span></div></td>
+      <td><div class="score-bar"><span class="fill ft" style="width:76.99999999999999%"></span><span class="score-num">0.77</span></div></td>
+      <td class="improve negative">-0.01</td>
+    </tr>
+    <tr>
+      <td class="metric-name">Overall Score</td>
+      <td><div class="score-bar"><span class="fill base" style="width:39.75%"></span><span class="score-num">0.40</span></div></td>
+      <td><div class="score-bar"><span class="fill ft" style="width:74.95%"></span><span class="score-num">0.75</span></div></td>
+      <td class="improve positive">+0.35</td>
+    </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Detailed comparison (all test cases)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Question</th>
+            <th>Base brand</th>
+            <th>FT brand</th>
+            <th>Base policy</th>
+            <th>FT policy</th>
+            <th>Base overall</th>
+            <th>FT overall</th>
+            <th>Improvement</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+    <tr>
+      <td>1</td>
+      <td class="question" title="What is your return policy?">What is your return policy?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.70</td>
+      <td>0.70</td>
+      <td>0.51</td>
+      <td>0.87</td>
+      <td class="improve positive">0.36</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="question" title="Do you offer express shipping?">Do you offer express shipping?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.25</td>
+      <td>0.25</td>
+      <td>0.38</td>
+      <td>0.71</td>
+      <td class="improve positive">0.33</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="question" title="How can I contact customer support?">How can I contact customer support?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.50</td>
+      <td>1.00</td>
+      <td>0.48</td>
+      <td>0.96</td>
+      <td class="improve positive">0.48</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="question" title="My order hasn&#x27;t arrived yet and it&#x27;s been over a week. What should I do?">My order hasn&#x27;t arrived yet and it&#x27;s been over a week. What should ...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.31</td>
+      <td>0.63</td>
+      <td class="improve positive">0.32</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="question" title="Can I return an item I bought last month if I still have the receipt?">Can I return an item I bought last month if I still have the receipt?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.00</td>
+      <td>0.70</td>
+      <td>0.30</td>
+      <td>0.81</td>
+      <td class="improve positive">0.51</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td class="question" title="I need to change my shipping address for an order that&#x27;s already been placed. Is that possible?">I need to change my shipping address for an order that&#x27;s already been pl...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.31</td>
+      <td>0.63</td>
+      <td class="improve positive">0.32</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="question" title="Do you price match with other electronics retailers?">Do you price match with other electronics retailers?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1.00</td>
+      <td>1.00</td>
+      <td>0.63</td>
+      <td>0.91</td>
+      <td class="improve positive">0.28</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td class="question" title="What kind of warranty do your products come with?">What kind of warranty do your products come with?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.50</td>
+      <td>0.50</td>
+      <td>0.43</td>
+      <td>0.75</td>
+      <td class="improve positive">0.32</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td class="question" title="I accidentally ordered the wrong item. Can I exchange it instead of returning?">I accidentally ordered the wrong item. Can I exchange it instead of returning?</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.34</td>
+      <td>0.64</td>
+      <td class="improve positive">0.30</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td class="question" title="I want to cancel my current order and also ask about your refund policy for future purchases">I want to cancel my current order and also ask about your refund policy for f...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.29</td>
+      <td>0.59</td>
+      <td class="improve positive">0.30</td>
+    </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Sample responses (first 3 test cases)</h2>
+      
+    <div class="sample-card">
+      <h3 class="sample-question">Test 1: What is your return policy?</h3>
+      <div class="two-col">
+        <div class="response-box base">
+          <h4>Base model</h4>
+          <p class="score">Score: 0.51</p>
+          <div class="response-text">Our return policy typically allows customers to return items within a specified time frame (usually 30 days) from the date of purchase, provided that the items are in their original condition and packaging. Please note that certain items, such as personalized or final sale products, may not be eligible for return.<br><br>To initiate a return, you generally need to follow these steps:<br><br>1. Contact our customer service team to request a return authorization.<br>2. Pack the item securely in it...</div>
+        </div>
+        <div class="response-box ft">
+          <h4>Fine-tuned model</h4>
+          <p class="score">Score: 0.87</p>
+          <div class="response-text">Thanks for reaching out! At TechGadgets, I completely understand your curiosity about our return policy. Allow me to provide you with the details. Our return policy allows customers to return their items within 30 days of purchase for a full refund or exchange, as long as the items are in their original condition and packaging. It&#x27;s important to note that certain items, such as personalized or customized products, may not be eligible for return. If you have any further questions or if there...</div>
+        </div>
+      </div>
+    </div>
+    <div class="sample-card">
+      <h3 class="sample-question">Test 2: Do you offer express shipping?</h3>
+      <div class="two-col">
+        <div class="response-box base">
+          <h4>Base model</h4>
+          <p class="score">Score: 0.38</p>
+          <div class="response-text">I don’t have access to specific shipping policies for your order, but many retailers do offer express shipping options. I recommend checking the shipping information on the website where you are making your purchase or contacting their customer service for details on express shipping availability and options.</div>
+        </div>
+        <div class="response-box ft">
+          <h4>Fine-tuned model</h4>
+          <p class="score">Score: 0.71</p>
+          <div class="response-text">Of course! At TechGadgets, We are thrilled to hear that you&#x27;re interested in our express shipping service. We understand that you might need your items quickly, and we&#x27;re here to help. With our express shipping option, you can enjoy the convenience of receiving your items in a shorter timeframe. Simply select the express shipping option during checkout, and we&#x27;ll ensure your order gets to you as soon as possible. If you have any specific questions or need further assistance, feel ...</div>
+        </div>
+      </div>
+    </div>
+    <div class="sample-card">
+      <h3 class="sample-question">Test 3: How can I contact customer support?</h3>
+      <div class="two-col">
+        <div class="response-box base">
+          <h4>Base model</h4>
+          <p class="score">Score: 0.48</p>
+          <div class="response-text">To contact customer support, you can typically find the following options:<br><br>1. **Phone Support**: Look for a customer service phone number on the company&#x27;s website. This is often listed in the &quot;Contact Us&quot; section.<br><br>2. **Email Support**: Many companies provide an email address for customer inquiries. Check the website for an appropriate email address to reach out.<br><br>3. **Live Chat**: Some websites offer a live chat feature where you can directly communicate with a...</div>
+        </div>
+        <div class="response-box ft">
+          <h4>Fine-tuned model</h4>
+          <p class="score">Score: 0.96</p>
+          <div class="response-text">Thank you for reaching out! At TechGadgets, I understand that you need assistance in contacting our customer support team. To reach out to us, you can use one of the following methods: 1. Phone: Call our customer support hotline at 1-800-TECH-HELP during our customer support hours. 2. Live Chat: Visit our website and click on the &quot;Live Chat&quot; option to connect with a representative in real-time. 3. Email: Send us an email at support@techgadgets.com, and our team will respond to you as s...</div>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <footer>
+      Generated from notebook 03_evaluation. Base model: gpt-4o-mini-2024-07-18 · Fine-tuned: ft:gpt-4o-mini-2024-07-18:personal:techgadgets-support:D7e2cpyK
+    </footer>
+  </div>
+</body>
+</html>
