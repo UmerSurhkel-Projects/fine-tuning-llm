@@ -10,14 +10,19 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, #1A237E 0%, #283593 100%);
+  background-color: #111427;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .chat-container {
   width: 100%;
   max-width: 900px;
   height: 90vh;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -26,7 +31,7 @@
 }
 
 .chat-header {
-  background: #1A237E;
+  background: #111427;
   padding: 20px 30px;
   color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -35,38 +40,13 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 15px;
-}
-
-.logo-monogram {
-  display: flex;
-  align-items: center;
   justify-content: center;
 }
 
-.logo-monogram svg {
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.logo-line1,
-.logo-line2 {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.85);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  opacity: 0.9;
-}
-
-.logo-line2 {
-  margin-top: 2px;
+.logo-image {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
 }
 
 .chat-messages {
@@ -175,6 +155,17 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.order-badge {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #673AB7 0%, #512DA8 100%);
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
 .typing-indicator {
   display: flex;
   gap: 6px;
@@ -206,6 +197,64 @@
     transform: translateY(-10px);
     opacity: 1;
   }
+}
+
+.phone-input-container {
+  padding: 12px 20px;
+  background: #FFF3E0;
+  border-top: 1px solid #E0E0E0;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.phone-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #FFB74D;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.phone-input:focus {
+  border-color: #673AB7;
+}
+
+.phone-submit-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #673AB7 0%, #512DA8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.phone-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 58, 183, 0.4);
+}
+
+.phone-submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.phone-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #E65100;
+  font-weight: 500;
 }
 
 .chat-input-wrapper {
@@ -330,13 +379,7 @@
     max-width: 85%;
   }
 
-  .logo-line1,
-  .logo-line2 {
-    font-size: 20px;
-  }
-
-  .logo-monogram svg {
-    width: 40px;
+  .logo-image {
     height: 40px;
   }
 

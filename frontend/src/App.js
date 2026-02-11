@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
+import backgroundImage from './assets/background.png';
 
 // Backend API base URL
 const API_BASE_URL = 'http://127.0.0.1:5000';
@@ -9,6 +10,9 @@ function App() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [backendConnected, setBackendConnected] = useState(null);
+  const [needsPhone, setNeedsPhone] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -49,12 +53,22 @@ function App() {
     setIsLoading(true);
 
     try {
+      const requestBody = {
+        message: userMessage,
+        session_id: sessionId,
+      };
+      
+      // Include phone number if available
+      if (phoneNumber) {
+        requestBody.phone_number = phoneNumber;
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify(requestBody),
       });
 
       // Read response body as text first (can only be read once)
@@ -104,7 +118,20 @@ function App() {
       }
 
       if (data.response) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: data.response,
+          orderFound: data.order_found,
+          orderId: data.order_id,
+          orderStatus: data.order_status
+        }]);
+        
+        // Check if phone number is needed
+        if (data.needs_phone && !phoneNumber) {
+          setNeedsPhone(true);
+        } else {
+          setNeedsPhone(false);
+        }
       } else {
         throw new Error('No response in data');
       }
@@ -134,31 +161,11 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="App" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="chat-container">
         <header className="chat-header">
           <div className="logo-container">
-            <div className="logo-monogram">
-              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#D1C4E9" />
-                    <stop offset="100%" stopColor="#673AB7" />
-                  </linearGradient>
-                </defs>
-                {/* Integrated TG monogram - T and G share vertical stem */}
-                {/* T top bar with rounded corners */}
-                <rect x="6" y="6" width="24" height="8" rx="4" fill="url(#logoGradient)" />
-                {/* Shared vertical stem (T and G) */}
-                <rect x="16" y="14" width="5" height="34" rx="2.5" fill="url(#logoGradient)" />
-                {/* G shape - rounded rectangle integrated with T */}
-                <path d="M28 16 C28 13, 30.5 11, 33.5 11 C36.5 11, 39 13, 39 16 L39 44 C39 47, 36.5 49, 33.5 49 C30.5 49, 28 47, 28 44 L28 32 L37 32 L37 44 C37 45.5, 35.5 47, 34 47 C32.5 47, 31 45.5, 31 44 L31 16 C31 14.5, 32.5 13, 34 13 C35.5 13, 37 14.5, 37 16 L37 28 L28 28 Z" fill="url(#logoGradient)" />
-              </svg>
-            </div>
-            <div className="logo-text">
-              <div className="logo-line1">TECH</div>
-              <div className="logo-line2">GADGET</div>
-            </div>
+            <img src="/assets/logo.png" alt="TechGadgets Logo" className="logo-image" />
           </div>
         </header>
 
@@ -176,7 +183,14 @@ function App() {
           )}
           {messages.map((msg, index) => (
             <div key={index} className={`message ${msg.role}`}>
-              <div className="message-content">{msg.content}</div>
+              <div className="message-content">
+                {msg.content}
+                {msg.orderFound && (
+                  <div className="order-badge">
+                    Order: {msg.orderId} | Status: {msg.orderStatus}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
           {isLoading && (
@@ -194,28 +208,94 @@ function App() {
         </div>
 
         <div className="chat-input-wrapper">
-          <div className="chat-input-container">
-            <textarea
-              ref={textareaRef}
-              className="chat-input"
-              placeholder="Type your message... (Shift+Enter for new line)"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={3}
-              disabled={isLoading}
-            />
-            <button
-              className="send-button"
-              onClick={handleSend}
-              disabled={!input.trim() || isLoading}
-              title="Send message"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
-              </svg>
-            </button>
+        {needsPhone && !phoneNumber && (
+          <div className="phone-input-container">
+            <div className="phone-input-wrapper">
+              <input
+                type="tel"
+                className="phone-input"
+                placeholder="Enter your phone number (e.g., 555-123-4567)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && phoneNumber.trim()) {
+                    handleSend();
+                  }
+                }}
+              />
+              <button
+                className="phone-submit-button"
+                onClick={async () => {
+                  if (phoneNumber.trim()) {
+                    setIsLoading(true);
+                    setMessages(prev => [...prev, { role: 'user', content: `Phone: ${phoneNumber}` }]);
+                    try {
+                      const response = await fetch(`${API_BASE_URL}/api/chat`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                          message: `My phone number is ${phoneNumber}`,
+                          session_id: sessionId,
+                          phone_number: phoneNumber
+                        }),
+                      });
+                      const responseText = await response.text();
+                      if (response.ok) {
+                        const data = JSON.parse(responseText);
+                        if (data.response) {
+                          setMessages(prev => [...prev, { 
+                            role: 'assistant', 
+                            content: data.response,
+                            orderFound: data.order_found,
+                            orderId: data.order_id,
+                            orderStatus: data.order_status
+                          }]);
+                          setNeedsPhone(false);
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error submitting phone:', error);
+                      setMessages(prev => [...prev, { 
+                        role: 'assistant', 
+                        content: 'Sorry, there was an error processing your phone number. Please try again.' 
+                      }]);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }
+                }}
+                disabled={!phoneNumber.trim() || isLoading}
+              >
+                Submit
+              </button>
+            </div>
+            <p className="phone-hint">Please provide your phone number for order verification</p>
           </div>
+        )}
+        <div className="chat-input-container">
+          <textarea
+            ref={textareaRef}
+            className="chat-input"
+            placeholder={needsPhone && !phoneNumber ? "Please provide your phone number above first" : "Type your message..."}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={3}
+            disabled={isLoading || (needsPhone && !phoneNumber)}
+          />
+          <button
+            className="send-button"
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading || (needsPhone && !phoneNumber)}
+            title="Send message"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
         </div>
       </div>
     </div>
