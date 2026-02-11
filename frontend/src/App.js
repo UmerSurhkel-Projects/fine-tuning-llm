@@ -138,7 +138,27 @@ function App() {
       <div className="chat-container">
         <header className="chat-header">
           <div className="logo-container">
-            <div className="logo">TechGadgets</div>
+            <div className="logo-monogram">
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#D1C4E9" />
+                    <stop offset="100%" stopColor="#673AB7" />
+                  </linearGradient>
+                </defs>
+                {/* Integrated TG monogram - T and G share vertical stem */}
+                {/* T top bar with rounded corners */}
+                <rect x="6" y="6" width="24" height="8" rx="4" fill="url(#logoGradient)" />
+                {/* Shared vertical stem (T and G) */}
+                <rect x="16" y="14" width="5" height="34" rx="2.5" fill="url(#logoGradient)" />
+                {/* G shape - rounded rectangle integrated with T */}
+                <path d="M28 16 C28 13, 30.5 11, 33.5 11 C36.5 11, 39 13, 39 16 L39 44 C39 47, 36.5 49, 33.5 49 C30.5 49, 28 47, 28 44 L28 32 L37 32 L37 44 C37 45.5, 35.5 47, 34 47 C32.5 47, 31 45.5, 31 44 L31 16 C31 14.5, 32.5 13, 34 13 C35.5 13, 37 14.5, 37 16 L37 28 L28 28 Z" fill="url(#logoGradient)" />
+              </svg>
+            </div>
+            <div className="logo-text">
+              <div className="logo-line1">TECH</div>
+              <div className="logo-line2">GADGET</div>
+            </div>
           </div>
         </header>
 
@@ -173,24 +193,29 @@ function App() {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="chat-input-container">
-          <textarea
-            ref={textareaRef}
-            className="chat-input"
-            placeholder="Type your message... (Shift+Enter for new line)"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            disabled={isLoading}
-          />
-          <button
-            className="send-button"
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-          >
-            Send
-          </button>
+        <div className="chat-input-wrapper">
+          <div className="chat-input-container">
+            <textarea
+              ref={textareaRef}
+              className="chat-input"
+              placeholder="Type your message... (Shift+Enter for new line)"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={3}
+              disabled={isLoading}
+            />
+            <button
+              className="send-button"
+              onClick={handleSend}
+              disabled={!input.trim() || isLoading}
+              title="Send message"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
